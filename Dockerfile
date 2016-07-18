@@ -1,10 +1,4 @@
-FROM alpine:3.3
-
-RUN apk -U add curl
-
-RUN curl https://secure-static.ztat.net/ca/zalando-service-combined.ca > \
-      /usr/share/ca-certificates/zalando-service-combined.crt
-RUN update-ca-certificates
+FROM registry.opensource.zalan.do/stups/ubuntu:16.04-35
 
 COPY entrypoint.sh /
 
