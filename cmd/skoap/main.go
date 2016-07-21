@@ -271,6 +271,12 @@ func main() {
 			eus = strings.Split(etcdUrls, ",")
 		}
 		o.EtcdUrls = eus
+
+		certPool, err := skoap.NewEtcdCertPool(eus, etcdPrefix)
+		if err != nil {
+			logrus.Errorf("failed to configure etcd CertPool: %s", err)
+		}
+		o.CertPool = certPool
 	} else {
 		var filterArgs []interface{}
 		if realm != "" {
