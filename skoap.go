@@ -102,7 +102,9 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/linki/ttlcache"
 	"github.com/zalando/skipper/filters"
 )
 
@@ -139,8 +141,11 @@ const (
 )
 
 type (
-	authClient    struct{ urlBase string }
-	teamClient    struct{ urlBase string }
+	authClient struct{ urlBase string }
+	teamClient struct {
+		urlBase string
+		cache   *ttlcache.Cache
+	}
 	serviceClient struct{ urlBase string }
 
 	authDoc struct {
@@ -283,6 +288,10 @@ func (ac *authClient) validate(token string) (*authDoc, error) {
 }
 
 func (tc *teamClient) getTeams(uid, token string) ([]string, error) {
+	if teams, ok := tc.cache.Get(uid); ok {
+		return teams, nil
+	}
+
 	var t []teamDoc
 	err := jsonGet(tc.urlBase+uid, token, &t)
 	if err != nil {
@@ -293,6 +302,8 @@ func (tc *teamClient) getTeams(uid, token string) ([]string, error) {
 	for i, ti := range t {
 		ts[i] = ti.Id
 	}
+
+	tc.cache.Set(uid, ts)
 
 	return ts, nil
 }
@@ -310,7 +321,7 @@ func (sc *serviceClient) getOwner(uid, token string) (string, error) {
 func newSpec(typ roleCheckType, authUrlBase, teamUrlBase, serviceUrlBase string) filters.Spec {
 	s := &spec{typ: typ, authClient: &authClient{authUrlBase}}
 	if typ == checkTeam {
-		s.teamClient = &teamClient{teamUrlBase}
+		s.teamClient = &teamClient{teamUrlBase, ttlcache.NewCache(1 * time.Second)}
 		s.serviceClient = &serviceClient{serviceUrlBase}
 	}
 
