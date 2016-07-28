@@ -98,11 +98,16 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"github.com/zalando/skipper/filters"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/linki/ttlcache"
+
+	"github.com/zalando/skipper/filters"
 )
 
 const (
@@ -139,7 +144,10 @@ const (
 
 type (
 	authClient struct{ urlBase string }
-	teamClient struct{ urlBase string }
+	teamClient struct {
+		urlBase string
+		cache   *ttlcache.Cache
+	}
 
 	authDoc struct {
 		Uid    string   `json:"uid"`
@@ -275,7 +283,12 @@ func (ac *authClient) validate(token string) (*authDoc, error) {
 }
 
 func (tc *teamClient) getTeams(uid, token string) ([]string, error) {
+	if teams, ok := tc.cache.Get(uid); ok {
+		return teams, nil
+	}
+
 	var t []teamDoc
+	fmt.Printf("HIT TEAM SERVICE for '%s'\n", uid)
 	err := jsonGet(tc.urlBase+uid, token, &t)
 	if err != nil {
 		return nil, err
@@ -286,13 +299,15 @@ func (tc *teamClient) getTeams(uid, token string) ([]string, error) {
 		ts[i] = ti.Id
 	}
 
+	tc.cache.Set(uid, ts)
+
 	return ts, nil
 }
 
 func newSpec(typ roleCheckType, authUrlBase, teamUrlBase string) filters.Spec {
 	s := &spec{typ: typ, authClient: &authClient{authUrlBase}}
 	if typ == checkTeam {
-		s.teamClient = &teamClient{teamUrlBase}
+		s.teamClient = &teamClient{teamUrlBase, ttlcache.NewCache(1 * time.Second)}
 	}
 
 	return s
