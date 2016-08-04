@@ -26,10 +26,10 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/zalando/skipper/certpool"
 	"github.com/zalando/skipper/filters"
 	"github.com/zalando/skipper/metrics"
 	"github.com/zalando/skipper/routing"
-	tlss "github.com/zalando/skipper/tls"
 )
 
 const (
@@ -117,7 +117,7 @@ type Params struct {
 
 	// CertPool defines the set of root certificates authorities that the
 	// proxy use when verifying server certificates at the endpoint.
-	CertPool tlss.CertPool
+	CertPool certpool.CertPool
 }
 
 // When set, the proxy will skip the TLS verification on outgoing requests.

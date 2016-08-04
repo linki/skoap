@@ -22,6 +22,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/zalando/skipper/certpool"
 	"github.com/zalando/skipper/eskipfile"
 	"github.com/zalando/skipper/etcd"
 	"github.com/zalando/skipper/filters"
@@ -33,7 +34,6 @@ import (
 	"github.com/zalando/skipper/predicates/source"
 	"github.com/zalando/skipper/proxy"
 	"github.com/zalando/skipper/routing"
-	"github.com/zalando/skipper/tls"
 )
 
 const (
@@ -187,7 +187,7 @@ type Options struct {
 
 	// CertPool defines the set of root certificates authorities that the
 	// proxy use when verifying server certificates at the endpoint.
-	CertPool tls.CertPool
+	CertPool certpool.CertPool
 }
 
 func createDataClients(o Options, auth innkeeper.Authentication) ([]routing.DataClient, error) {
@@ -365,7 +365,7 @@ func Run(o Options) error {
 		updateBuffer})
 
 	if o.CertPool == nil {
-		o.CertPool = &tls.DefaultCertPool{}
+		o.CertPool = &certpool.DefaultCertPool{}
 	}
 
 	proxyFlags := proxy.Flags(o.ProxyOptions) | o.ProxyFlags

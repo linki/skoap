@@ -10,7 +10,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/coreos/etcd/client"
-	"github.com/zalando/skipper/tls"
+	"github.com/zalando/skipper/certpool"
 )
 
 const (
@@ -26,7 +26,7 @@ type etcdCertPool struct {
 	etcdIndex uint64
 }
 
-func NewEtcdCertPool(endpoints []string, prefix string) (tls.CertPool, error) {
+func NewEtcdCertPool(endpoints []string, prefix string) (certpool.CertPool, error) {
 	cfg := client.Config{
 		Endpoints: endpoints,
 		Transport: client.DefaultTransport,
