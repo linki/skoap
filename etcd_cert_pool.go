@@ -66,9 +66,10 @@ func (e *etcdCertPool) run() {
 		for _, node := range resp.Node.Nodes {
 			err := e.certPool.AppendCertsFromPEM(node.Key, []byte(node.Value))
 			if err != nil {
-				logrus.Errorf("failed to add Cert: %s", err)
+				logrus.Errorf("failed to add Cert %s: %s", node.Key, err)
 				continue
 			}
+			logrus.Infof("Added certificate for %s", node.Key)
 		}
 
 		opts := &client.WatcherOptions{
@@ -86,9 +87,10 @@ func (e *etcdCertPool) run() {
 
 			err = e.certPool.AppendCertsFromPEM(resp.Node.Key, []byte(resp.Node.Value))
 			if err != nil {
-				logrus.Errorf("failed to add certificate: %s", err)
+				logrus.Errorf("failed to add certificate %s: %s", resp.Node.Key, err)
 				continue
 			}
+			logrus.Infof("Added certificate for %s", resp.Node.Key)
 		}
 
 		// sleep for x number of minutes
