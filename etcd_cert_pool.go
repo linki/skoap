@@ -2,6 +2,7 @@ package skoap
 
 import (
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"time"
@@ -64,7 +65,7 @@ func (e *etcdCertPool) run() {
 		}
 
 		for _, node := range resp.Node.Nodes {
-			err := e.certPool.AppendCertsFromPEM(node.Key, []byte(node.Value))
+			err := e.addCert(resp.Node.Key, resp.Node.Value)
 			if err != nil {
 				logrus.Errorf("failed to add Cert %s: %s", node.Key, err)
 				continue
@@ -85,7 +86,7 @@ func (e *etcdCertPool) run() {
 				continue
 			}
 
-			err = e.certPool.AppendCertsFromPEM(resp.Node.Key, []byte(resp.Node.Value))
+			err = e.addCert(resp.Node.Key, resp.Node.Value)
 			if err != nil {
 				logrus.Errorf("failed to add certificate %s: %s", resp.Node.Key, err)
 				continue
@@ -96,6 +97,19 @@ func (e *etcdCertPool) run() {
 		// sleep for x number of minutes
 		time.Sleep(time.Duration(interval) * time.Minute)
 	}
+}
+
+func (e *etcdCertPool) addCert(id, encodedCert string) error {
+	data, err := base64.StdEncoding.DecodeString(encodedCert)
+	if err != nil {
+		return err
+	}
+
+	err = e.certPool.AppendCertsFromPEM(id, data)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type certPool struct {
