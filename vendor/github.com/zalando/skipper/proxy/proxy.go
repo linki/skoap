@@ -282,6 +282,10 @@ func WithParams(o Params) *Proxy {
 		}()
 	}
 
+	if o.CertPool == nil {
+		o.CertPool = &certpool.DefaultCertPool{}
+	}
+
 	tr.TLSClientConfig = &tls.Config{}
 	o.CertPool.Set(&tr.TLSClientConfig.RootCAs)
 

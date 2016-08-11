@@ -364,10 +364,6 @@ func Run(o Options) error {
 		o.CustomPredicates,
 		updateBuffer})
 
-	if o.CertPool == nil {
-		o.CertPool = &certpool.DefaultCertPool{}
-	}
-
 	proxyFlags := proxy.Flags(o.ProxyOptions) | o.ProxyFlags
 	proxyParams := proxy.Params{
 		Routing:                routing,
