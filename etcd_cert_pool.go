@@ -65,7 +65,7 @@ func (e *etcdCertPool) run() {
 		}
 
 		for _, node := range resp.Node.Nodes {
-			err := e.addCert(resp.Node.Key, resp.Node.Value)
+			err := e.addCert(node.Key, node.Value)
 			if err != nil {
 				logrus.Errorf("failed to add Cert %s: %s", node.Key, err)
 				continue
