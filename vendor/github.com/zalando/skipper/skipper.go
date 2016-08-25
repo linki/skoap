@@ -30,7 +30,9 @@ import (
 	"github.com/zalando/skipper/innkeeper"
 	"github.com/zalando/skipper/logging"
 	"github.com/zalando/skipper/metrics"
+	"github.com/zalando/skipper/predicates/cookie"
 	"github.com/zalando/skipper/predicates/interval"
+	"github.com/zalando/skipper/predicates/query"
 	"github.com/zalando/skipper/predicates/source"
 	"github.com/zalando/skipper/proxy"
 	"github.com/zalando/skipper/routing"
@@ -353,16 +355,22 @@ func Run(o Options) error {
 
 	// include bundeled custom predicates
 	o.CustomPredicates = append(o.CustomPredicates,
-		source.New(), interval.NewBetween(), interval.NewBefore(), interval.NewAfter())
+		source.New(),
+		interval.NewBetween(),
+		interval.NewBefore(),
+		interval.NewAfter(),
+		cookie.New(),
+		query.New())
 
 	// create a routing engine
 	routing := routing.New(routing.Options{
-		registry,
-		mo,
-		o.SourcePollTimeout,
-		dataClients,
-		o.CustomPredicates,
-		updateBuffer})
+		FilterRegistry:  registry,
+		MatchingOptions: mo,
+		PollTimeout:     o.SourcePollTimeout,
+		DataClients:     dataClients,
+		Predicates:      o.CustomPredicates,
+		UpdateBuffer:    updateBuffer})
+	defer routing.Close()
 
 	proxyFlags := proxy.Flags(o.ProxyOptions) | o.ProxyFlags
 	proxyParams := proxy.Params{
@@ -385,6 +393,7 @@ func Run(o Options) error {
 
 	// create the proxy
 	proxy := proxy.WithParams(proxyParams)
+	defer proxy.Close()
 
 	return listenAndServe(proxy, &o)
 }

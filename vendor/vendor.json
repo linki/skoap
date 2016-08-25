@@ -51,135 +51,153 @@
 			"revisionTime": "2016-04-21T14:05:07Z"
 		},
 		{
-			"checksumSHA1": "k2v+41TfNG7/foj/Dy145Am1QUk=",
+			"checksumSHA1": "HvtpYz7J7KUk7dc/Q51TNSmLprk=",
 			"path": "github.com/zalando/skipper",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "ZrgzghKo2y0CzadpLiuQeDV3bP4=",
 			"path": "github.com/zalando/skipper/certpool",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
-			"checksumSHA1": "5osK6HkcFQ5Q7zJJHi1YAPqqSqY=",
+			"checksumSHA1": "8LQZchp9LsFGCJJYEiGWRlNqzyI=",
 			"path": "github.com/zalando/skipper/eskip",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "LpllYp5YYaHTCa8RS00L8hhlA4U=",
 			"path": "github.com/zalando/skipper/eskipfile",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "5u8SphxU8MaNZiXom/wGMEul17I=",
 			"path": "github.com/zalando/skipper/etcd",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "s30ToEON56OVZ5QPcFmBbER+hWs=",
 			"path": "github.com/zalando/skipper/filters",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "R8LUTysAC9e6acfEaP4+zMszv2s=",
 			"path": "github.com/zalando/skipper/filters/builtin",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
-			"checksumSHA1": "+q+1ky0zGXvfQ7X/v7GTumVclhE=",
+			"checksumSHA1": "XiQKBZHdSwwCZC51Jkt3ioa3L7c=",
 			"path": "github.com/zalando/skipper/filters/diag",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "3CNmdSPLMHvJcb0+JcE+h0LQ9V8=",
 			"path": "github.com/zalando/skipper/filters/flowid",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "mP+cFGwoHhSUQUduAcz5vpkvAE8=",
 			"path": "github.com/zalando/skipper/filters/serve",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
-			"checksumSHA1": "YBfzH6Cykl4G7Rj9OxaNHU8XOvQ=",
+			"checksumSHA1": "2lbWM1ForAlfLGTO1dkO6gQi/UM=",
 			"path": "github.com/zalando/skipper/innkeeper",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
-			"checksumSHA1": "KHKF1ijmMQ+YfQQEkMQ2cHTnF1s=",
+			"checksumSHA1": "5KZyMV7tJ1HnMa8jtOYK4zjsF3M=",
 			"path": "github.com/zalando/skipper/logging",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
+			"revisionTime": "2016-08-11T15:24:22Z"
+		},
+		{
+			"checksumSHA1": "UV8AshcQjVfk43KQ7nnCYzWGPQY=",
+			"path": "github.com/zalando/skipper/logging/loggingtest",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "CmxIZsn0U2NtmmcnIJ/CS2VFsiU=",
 			"path": "github.com/zalando/skipper/metrics",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "zUgrr117GRXeffOLX8DYeRm1jUE=",
 			"path": "github.com/zalando/skipper/net",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "j5daivM4NZyO1X/X6L5ehhVaYQU=",
 			"path": "github.com/zalando/skipper/oauth",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "UFr3sX+G5roLb3sMTlveXZf/qbw=",
 			"path": "github.com/zalando/skipper/predicates",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
+			"revisionTime": "2016-08-11T15:24:22Z"
+		},
+		{
+			"checksumSHA1": "2TCEzQwlv68Xwix6ZVebRhqvhdo=",
+			"path": "github.com/zalando/skipper/predicates/cookie",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "6u6jNaO4c5cRI9cNwXklr/Ij2ZU=",
 			"path": "github.com/zalando/skipper/predicates/interval",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
+			"revisionTime": "2016-08-11T15:24:22Z"
+		},
+		{
+			"checksumSHA1": "hLpPFBqgjlNmmwwRdqF5NpRfOTs=",
+			"path": "github.com/zalando/skipper/predicates/query",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "wiP1lhizUuGg6zK6rWIaTMtQTxs=",
 			"path": "github.com/zalando/skipper/predicates/source",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
-			"checksumSHA1": "DiIJ2p/8EyfNBvDD/+Yzt2JcOoI=",
+			"checksumSHA1": "B2Y9Qad/542X8yUfj09kUzn/3Z4=",
 			"path": "github.com/zalando/skipper/proxy",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
-			"checksumSHA1": "zOVWqz7oCX8zJBMHRP857k8TNRk=",
+			"checksumSHA1": "KVNvgGD5uMNwiWRQ2HfsHUm4RgI=",
 			"path": "github.com/zalando/skipper/proxy/proxytest",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
-			"checksumSHA1": "/pSdUk46ZDtYKt62Bt7NP+11mL4=",
+			"checksumSHA1": "kHqnCitfYa9cpaKJS3SqbGu84eI=",
 			"path": "github.com/zalando/skipper/routing",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{
 			"checksumSHA1": "HmqIBaiImsmGnQSzXKqhwoYkhls=",
 			"path": "github.com/zalando/skipper/routing/testdataclient",
-			"revision": "a2613e258536e60b79ab6e2cb12ac30a0050899c",
+			"revision": "96b3bed6ef970cfb0610dd70f6b100fbd445437e",
 			"revisionTime": "2016-08-11T15:24:22Z"
 		},
 		{

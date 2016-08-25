@@ -40,9 +40,10 @@ func getUpgradeRequest(req *http.Request) string {
 
 // UpgradeProxy stores everything needed to make the connection upgrade.
 type upgradeProxy struct {
-	backendAddr  *url.URL
-	reverseProxy *httputil.ReverseProxy
-	insecure     bool
+	backendAddr     *url.URL
+	reverseProxy    *httputil.ReverseProxy
+	insecure        bool
+	tlsClientConfig *tls.Config
 }
 
 // TODO: add user here
@@ -147,7 +148,7 @@ func (p *upgradeProxy) dialBackend(req *http.Request) (net.Conn, error) {
 			return nil, err
 		}
 		// system Roots are used
-		tlsConn, err := tls.Dial("tcp", dialAddr, &tls.Config{})
+		tlsConn, err := tls.Dial("tcp", dialAddr, p.tlsClientConfig)
 		if err != nil {
 			return nil, err
 		}

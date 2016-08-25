@@ -165,6 +165,7 @@ type Proxy struct {
 	quit                chan struct{}
 	flushInterval       time.Duration
 	experimentalUpgrade bool
+	tlsClientConfig     *tls.Config
 }
 
 type filterContext struct {
@@ -306,7 +307,8 @@ func WithParams(o Params) *Proxy {
 		metrics:             m,
 		quit:                quit,
 		flushInterval:       o.FlushInterval,
-		experimentalUpgrade: o.ExperimentalUpgrade}
+		experimentalUpgrade: o.ExperimentalUpgrade,
+		tlsClientConfig:     tr.TLSClientConfig}
 }
 
 // calls a function with recovering from panics and logging them
@@ -557,9 +559,10 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				reverseProxy := httputil.NewSingleHostReverseProxy(backendURL)
 				reverseProxy.FlushInterval = p.flushInterval
 				upgradeProxy := upgradeProxy{
-					backendAddr:  backendURL,
-					reverseProxy: reverseProxy,
-					insecure:     p.flags.Insecure(),
+					backendAddr:     backendURL,
+					reverseProxy:    reverseProxy,
+					insecure:        p.flags.Insecure(),
+					tlsClientConfig: p.tlsClientConfig,
 				}
 				upgradeProxy.serveHTTP(w, rr)
 				log.Debugf("Finished upgraded protocol %s session", getUpgradeRequest(r))
