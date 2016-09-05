@@ -158,14 +158,13 @@ type bodyBuffer struct {
 // initializing, see the WithParams the constructor and Params.
 type Proxy struct {
 	routing             *routing.Routing
-	roundTripper        http.RoundTripper
+	roundTripper        *http.Transport
 	priorityRoutes      []PriorityRoute
 	flags               Flags
 	metrics             *metrics.Metrics
 	quit                chan struct{}
 	flushInterval       time.Duration
 	experimentalUpgrade bool
-	tlsClientConfig     *tls.Config
 }
 
 type filterContext struct {
@@ -307,8 +306,7 @@ func WithParams(o Params) *Proxy {
 		metrics:             m,
 		quit:                quit,
 		flushInterval:       o.FlushInterval,
-		experimentalUpgrade: o.ExperimentalUpgrade,
-		tlsClientConfig:     tr.TLSClientConfig}
+		experimentalUpgrade: o.ExperimentalUpgrade}
 }
 
 // calls a function with recovering from panics and logging them
@@ -562,7 +560,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					backendAddr:     backendURL,
 					reverseProxy:    reverseProxy,
 					insecure:        p.flags.Insecure(),
-					tlsClientConfig: p.tlsClientConfig,
+					tlsClientConfig: p.roundTripper.TLSClientConfig,
 				}
 				upgradeProxy.serveHTTP(w, rr)
 				log.Debugf("Finished upgraded protocol %s session", getUpgradeRequest(r))
@@ -580,13 +578,6 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				log.Error(err)
 				return
 			}
-
-			defer func() {
-				err = rs.Body.Close()
-				if err != nil {
-					log.Error(err)
-				}
-			}()
 		}
 
 		p.metrics.MeasureBackend(rt.Id, start)
@@ -599,6 +590,15 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	p.applyFiltersToResponse(processedFilters, c, onErr)
 	p.metrics.MeasureAllFiltersResponse(rt.Id, start)
+
+	if c.res.Body != nil {
+		defer func(body io.Closer) {
+			err := body.Close()
+			if err != nil {
+				log.Error(err)
+			}
+		}(c.res.Body)
+	}
 
 	if !c.served {
 		if p.flags.Debug() {
