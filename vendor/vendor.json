@@ -33,6 +33,12 @@
 			"revisionTime": "2014-05-15T16:47:37Z"
 		},
 		{
+			"checksumSHA1": "7zQxj/6DgVld1BVPM3MBBqb/xXI=",
+			"path": "github.com/linki/ttlcache",
+			"revision": "c30a79e692f7a4309a125901b113c113895c1caa",
+			"revisionTime": "2016-07-28T12:45:05Z"
+		},
+		{
 			"checksumSHA1": "L9tyl9ng4rQHTPVoQK1TIuMO2VA=",
 			"path": "github.com/rcrowley/go-metrics",
 			"revision": "cfa5a85e9f0abbdf1701b59082c36fc7bff10759",
