@@ -1,4 +1,4 @@
-FROM registry.opensource.zalan.do/stups/ubuntu:16.04-35
+FROM registry.opensource.zalan.do/stups/ubuntu:16.04-45
 
 COPY entrypoint.sh /
 
