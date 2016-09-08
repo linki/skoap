@@ -98,11 +98,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"github.com/zalando/skipper/filters"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/zalando/skipper/filters"
 )
 
 const (
@@ -138,8 +139,9 @@ const (
 )
 
 type (
-	authClient struct{ urlBase string }
-	teamClient struct{ urlBase string }
+	authClient    struct{ urlBase string }
+	teamClient    struct{ urlBase string }
+	serviceClient struct{ urlBase string }
 
 	authDoc struct {
 		Uid    string   `json:"uid"`
@@ -151,18 +153,24 @@ type (
 		Id string `json:"id"`
 	}
 
+	serviceDoc struct {
+		Owner string `json:"owner"`
+	}
+
 	spec struct {
-		typ        roleCheckType
-		authClient *authClient
-		teamClient *teamClient
+		typ           roleCheckType
+		authClient    *authClient
+		teamClient    *teamClient
+		serviceClient *serviceClient
 	}
 
 	filter struct {
-		typ        roleCheckType
-		authClient *authClient
-		teamClient *teamClient
-		realm      string
-		args       []string
+		typ           roleCheckType
+		authClient    *authClient
+		teamClient    *teamClient
+		serviceClient *serviceClient
+		realms        []string
+		args          []string
 	}
 
 	basic string
@@ -289,10 +297,21 @@ func (tc *teamClient) getTeams(uid, token string) ([]string, error) {
 	return ts, nil
 }
 
-func newSpec(typ roleCheckType, authUrlBase, teamUrlBase string) filters.Spec {
+func (sc *serviceClient) getOwner(uid, token string) (string, error) {
+	var s serviceDoc
+	err := jsonGet(sc.urlBase+uid, token, &s)
+	if err != nil {
+		return "", err
+	}
+
+	return s.Owner, nil
+}
+
+func newSpec(typ roleCheckType, authUrlBase, teamUrlBase, serviceUrlBase string) filters.Spec {
 	s := &spec{typ: typ, authClient: &authClient{authUrlBase}}
 	if typ == checkTeam {
 		s.teamClient = &teamClient{teamUrlBase}
+		s.serviceClient = &serviceClient{serviceUrlBase}
 	}
 
 	return s
@@ -309,7 +328,7 @@ func newSpec(typ roleCheckType, authUrlBase, teamUrlBase string) filters.Spec {
 // The token is set as the Authorization Bearer header.
 //
 func NewAuth(authUrlBase string) filters.Spec {
-	return newSpec(checkScope, authUrlBase, "")
+	return newSpec(checkScope, authUrlBase, "", "")
 }
 
 // Creates a new auth filter specification to validate authorization
@@ -326,8 +345,8 @@ func NewAuth(authUrlBase string) filters.Spec {
 // user is a member of ('id' field of the returned json document's
 // items). The user id of the user is appended at the end of the url.
 //
-func NewAuthTeam(authUrlBase, teamUrlBase string) filters.Spec {
-	return newSpec(checkTeam, authUrlBase, teamUrlBase)
+func NewAuthTeam(authUrlBase, teamUrlBase, serviceUrlBase string) filters.Spec {
+	return newSpec(checkTeam, authUrlBase, teamUrlBase, serviceUrlBase)
 }
 
 func (s *spec) Name() string {
@@ -344,21 +363,33 @@ func (s *spec) CreateFilter(args []interface{}) (filters.Filter, error) {
 		return nil, err
 	}
 
-	f := &filter{typ: s.typ, authClient: s.authClient, teamClient: s.teamClient}
+	f := &filter{
+		typ:           s.typ,
+		authClient:    s.authClient,
+		teamClient:    s.teamClient,
+		serviceClient: s.serviceClient,
+	}
 	if len(sargs) > 0 {
-		f.realm, f.args = sargs[0], sargs[1:]
+		f.realms = make([]string, 0)
+		for _, realm := range sargs {
+			if strings.HasPrefix(realm, "/") {
+				f.realms = append(f.realms, realm)
+				continue
+			}
+			break
+		}
+		f.args = sargs[len(f.realms):]
 	}
 
 	return f, nil
-
 }
 
 func (f *filter) validateRealm(a *authDoc) bool {
-	if f.realm == "" {
+	if len(f.realms) == 0 {
 		return true
 	}
 
-	return a.Realm == f.realm
+	return intersect([]string{a.Realm}, f.realms)
 }
 
 func (f *filter) validateScope(a *authDoc) bool {
@@ -375,7 +406,12 @@ func (f *filter) validateTeam(token string, a *authDoc) (bool, error) {
 	}
 
 	teams, err := f.teamClient.getTeams(a.Uid, token)
-	return intersect(f.args, teams), err
+	if !intersect(f.args, teams) {
+		// try services API
+		owner, err := f.serviceClient.getOwner(a.Uid, token)
+		return intersect(f.args, []string{owner}), err
+	}
+	return true, err
 }
 
 func (f *filter) Request(ctx filters.FilterContext) {

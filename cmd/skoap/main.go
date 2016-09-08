@@ -46,6 +46,9 @@ const (
 	teamUrlBaseFlag    = "team-url"
 	defaultTeamUrlBase = "http://[::1]:9082/?uid="
 
+	serviceUrlBaseFlag    = "service-url"
+	defaultServiceUrlBase = "http://[::1]:9083/?uid="
+
 	tlsCertFlag = "tls-cert"
 	tlsKeyFlag  = "tls-key"
 
@@ -139,6 +142,7 @@ var (
 	insecure            bool
 	authUrlBase         string
 	teamUrlBase         string
+	serviceUrlBase      string
 	certPathTLS         string
 	keyPathTLS          string
 	verbose             bool
@@ -176,6 +180,7 @@ func init() {
 	fs.BoolVar(&insecure, insecureFlag, false, insecureUsage)
 	fs.StringVar(&authUrlBase, authUrlBaseFlag, "", authUrlBaseUsage)
 	fs.StringVar(&teamUrlBase, teamUrlBaseFlag, "", teamUrlBaseUsage)
+	fs.StringVar(&serviceUrlBase, serviceUrlBaseFlag, "", teamUrlBaseUsage)
 	fs.StringVar(&certPathTLS, tlsCertFlag, "", certPathTLSUsage)
 	fs.StringVar(&keyPathTLS, tlsKeyFlag, "", keyPathTLSUsage)
 	fs.BoolVar(&verbose, verboseFlag, false, verboseUsage)
@@ -244,12 +249,16 @@ func main() {
 		teamUrlBase = defaultTeamUrlBase
 	}
 
+	if serviceUrlBase == "" {
+		serviceUrlBase = defaultServiceUrlBase
+	}
+
 	o := skipper.Options{
 		Address:    address,
 		EtcdPrefix: etcdPrefix,
 		CustomFilters: []filters.Spec{
 			skoap.NewAuth(authUrlBase),
-			skoap.NewAuthTeam(authUrlBase, teamUrlBase),
+			skoap.NewAuthTeam(authUrlBase, teamUrlBase, serviceUrlBase),
 			skoap.NewBasicAuth(),
 			skoap.NewAuditLog(os.Stderr)},
 		AccessLogDisabled:   true,

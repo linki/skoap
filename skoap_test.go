@@ -2,24 +2,28 @@ package skoap
 
 import (
 	"encoding/json"
-	"github.com/zalando/skipper/eskip"
-	"github.com/zalando/skipper/filters"
-	"github.com/zalando/skipper/proxy/proxytest"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"path"
 	"strings"
 	"testing"
+
+	"github.com/zalando/skipper/eskip"
+	"github.com/zalando/skipper/filters"
+	"github.com/zalando/skipper/proxy/proxytest"
 )
 
 const (
-	testToken    = "test-token"
-	testUid      = "jdoe"
-	testScope    = "test-scope"
-	testRealm    = "/immortals"
-	testTeam     = "test-team"
-	testAuthPath = "/test-auth"
-	testTeamPath = "/test-team"
+	testToken        = "test-token"
+	testServiceToken = "test-service-token"
+	testUid          = "jdoe"
+	testScope        = "test-scope"
+	testRealm        = "/immortals"
+	testTeam         = "test-team"
+	testAuthPath     = "/test-auth"
+	testTeamPath     = "/test-team"
+	testServicePath  = "/test-service/"
 )
 
 type (
@@ -30,6 +34,11 @@ type (
 
 	testTeamDoc struct {
 		teamDoc
+		SomeOtherStuff string
+	}
+
+	testServiceDoc struct {
+		serviceDoc
 		SomeOtherStuff string
 	}
 )
@@ -45,14 +54,15 @@ func lastQueryValue(url string) string {
 
 func Test(t *testing.T) {
 	for _, ti := range []struct {
-		msg         string
-		typ         roleCheckType
-		authBaseUrl string
-		teamBaseUrl string
-		args        []interface{}
-		hasAuth     bool
-		auth        string
-		statusCode  int
+		msg            string
+		typ            roleCheckType
+		authBaseUrl    string
+		teamBaseUrl    string
+		serviceBaseUrl string
+		args           []interface{}
+		hasAuth        bool
+		auth           string
+		statusCode     int
 	}{{
 		msg:        "uninitialized filter, no authorization header, scope check",
 		typ:        checkScope,
@@ -106,63 +116,80 @@ func Test(t *testing.T) {
 		auth:        testToken,
 		statusCode:  http.StatusOK,
 	}, {
-		msg:         "no authorization header, team check",
-		typ:         checkTeam,
-		authBaseUrl: testAuthPath,
-		teamBaseUrl: testTeamPath,
-		statusCode:  http.StatusUnauthorized,
+		msg:            "no authorization header, team check",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath,
+		teamBaseUrl:    testTeamPath,
+		serviceBaseUrl: testServicePath,
+		statusCode:     http.StatusUnauthorized,
 	}, {
-		msg:         "invalid token, team check",
-		typ:         checkTeam,
-		authBaseUrl: testAuthPath + "?access_token=",
-		teamBaseUrl: testTeamPath + "?member=",
-		hasAuth:     true,
-		auth:        "invalid-token",
-		statusCode:  http.StatusUnauthorized,
+		msg:            "invalid token, team check",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath + "?access_token=",
+		teamBaseUrl:    testTeamPath + "?member=",
+		serviceBaseUrl: testServicePath,
+		hasAuth:        true,
+		auth:           "invalid-token",
+		statusCode:     http.StatusUnauthorized,
 	}, {
-		msg:         "valid token, auth only, team check",
-		typ:         checkTeam,
-		authBaseUrl: testAuthPath + "?access_token=",
-		teamBaseUrl: testTeamPath + "?member=",
-		hasAuth:     true,
-		auth:        testToken,
-		statusCode:  http.StatusOK,
+		msg:            "valid token, auth only, team check",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath + "?access_token=",
+		teamBaseUrl:    testTeamPath + "?member=",
+		serviceBaseUrl: testServicePath,
+		hasAuth:        true,
+		auth:           testToken,
+		statusCode:     http.StatusOK,
 	}, {
-		msg:         "invalid realm, team check",
-		typ:         checkTeam,
-		authBaseUrl: testAuthPath + "?access_token=",
-		teamBaseUrl: testTeamPath + "?member=",
-		args:        []interface{}{"/not-matching-realm"},
-		hasAuth:     true,
-		auth:        testToken,
-		statusCode:  http.StatusUnauthorized,
+		msg:            "invalid realm, team check",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath + "?access_token=",
+		teamBaseUrl:    testTeamPath + "?member=",
+		serviceBaseUrl: testServicePath,
+		args:           []interface{}{"/not-matching-realm"},
+		hasAuth:        true,
+		auth:           testToken,
+		statusCode:     http.StatusUnauthorized,
 	}, {
-		msg:         "valid token, valid realm, no team check",
-		typ:         checkTeam,
-		authBaseUrl: testAuthPath + "?access_token=",
-		teamBaseUrl: testTeamPath + "?member=",
-		args:        []interface{}{testRealm},
-		hasAuth:     true,
-		auth:        testToken,
-		statusCode:  http.StatusOK,
+		msg:            "valid token, valid realm, no team check",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath + "?access_token=",
+		teamBaseUrl:    testTeamPath + "?member=",
+		serviceBaseUrl: testServicePath,
+		args:           []interface{}{testRealm},
+		hasAuth:        true,
+		auth:           testToken,
+		statusCode:     http.StatusOK,
 	}, {
-		msg:         "valid token, valid realm, no matching team",
-		typ:         checkTeam,
-		authBaseUrl: testAuthPath + "?access_token=",
-		teamBaseUrl: testTeamPath + "?member=",
-		args:        []interface{}{testRealm, "invalid-team-0", "invalid-team-1"},
-		hasAuth:     true,
-		auth:        testToken,
-		statusCode:  http.StatusUnauthorized,
+		msg:            "valid token, valid realm, no matching team",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath + "?access_token=",
+		teamBaseUrl:    testTeamPath + "?member=",
+		serviceBaseUrl: testServicePath,
+		args:           []interface{}{testRealm, "invalid-team-0", "invalid-team-1"},
+		hasAuth:        true,
+		auth:           testToken,
+		statusCode:     http.StatusUnauthorized,
 	}, {
-		msg:         "valid token, valid realm, matching team, team",
-		typ:         checkTeam,
-		authBaseUrl: testAuthPath + "?access_token=",
-		teamBaseUrl: testTeamPath + "?member=",
-		args:        []interface{}{testRealm, "invalid-team-0", testTeam},
-		hasAuth:     true,
-		auth:        testToken,
-		statusCode:  http.StatusOK,
+		msg:            "valid token, valid realm, matching team, team",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath + "?access_token=",
+		teamBaseUrl:    testTeamPath + "?member=",
+		serviceBaseUrl: testServicePath,
+		args:           []interface{}{testRealm, "invalid-team-0", testTeam},
+		hasAuth:        true,
+		auth:           testToken,
+		statusCode:     http.StatusOK,
+	}, {
+		msg:            "valid token, valid realm, matching team, service",
+		typ:            checkTeam,
+		authBaseUrl:    testAuthPath + "?access_token=",
+		teamBaseUrl:    testTeamPath + "?member=",
+		serviceBaseUrl: testServicePath,
+		args:           []interface{}{testRealm, "invalid-team-0", testTeam},
+		hasAuth:        true,
+		auth:           testServiceToken,
+		statusCode:     http.StatusOK,
 	}} {
 		backend := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {}))
 
@@ -173,7 +200,7 @@ func Test(t *testing.T) {
 			}
 
 			token, err := getToken(r)
-			if err != nil || token != testToken {
+			if err != nil || (token != testToken && token != testServiceToken) {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
@@ -210,11 +237,35 @@ func Test(t *testing.T) {
 			}
 		}))
 
+		serviceServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != testServicePath+testUid {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+
+			if token, err := getToken(r); err != nil || token != testServiceToken {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			if path.Base(r.URL.Path) != testUid {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+
+			d := testServiceDoc{serviceDoc{testTeam}, "noise"}
+			e := json.NewEncoder(w)
+			err := e.Encode(&d)
+			if err != nil {
+				t.Error(ti.msg, err)
+			}
+		}))
+
 		var s filters.Spec
 		if ti.typ == checkScope {
 			s = NewAuth(authServer.URL + ti.authBaseUrl)
 		} else {
-			s = NewAuthTeam(authServer.URL+ti.authBaseUrl, teamServer.URL+ti.teamBaseUrl)
+			s = NewAuthTeam(authServer.URL+ti.authBaseUrl, teamServer.URL+ti.teamBaseUrl, serviceServer.URL+ti.serviceBaseUrl)
 		}
 		fr := make(filters.Registry)
 		fr.Register(s)
