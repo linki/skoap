@@ -289,7 +289,10 @@ func main() {
 	} else {
 		var filterArgs []interface{}
 		if realm != "" {
-			filterArgs = append(filterArgs, realm)
+			realms := strings.Split(realm, ",")
+			for _, r := range realms {
+				filterArgs = append(filterArgs, r)
+			}
 		}
 
 		args := scopes
